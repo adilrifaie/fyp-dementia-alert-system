@@ -25,15 +25,17 @@ Demans hastalarında ajitasyon, bakım verenler için en zorlu durumlardan birid
 **Projenin katkısı üç katmanda özetlenebilir:**
 - Ham sensör verilerinden klinik açıdan anlamlı davranışsal özniteliklerin çıkarılması
 - Hastaya özgü temel çizgi normalizasyonu ile kişiselleştirilmiş risk değerlendirmesi
-- Gerçek zamanlı izleme ve uyarı sunan tam yığın (full-stack) web uygulaması
+- Gerçek zamanlı izleme ve uyarı sunan tam yığın (full-stack) web uygulaması ve mobil uygulama
+
+**DementIQ** — projenin mobil arayüzü — React Native ve Expo ile geliştirilmiş olup bakıcılara hasta risk skorlarını, günlük sensör sinyallerini ve Groq LLM tabanlı bakım ipuçlarını tek bir ekrandan sunar.
 
 ---
 
 ## 2. Veri Seti
 
-**Kaynak:** TIHM (Technology Integrated Health Management) Veri Seti  
-**Yayın:** Palermo ve ark., *Nature Scientific Data*, 2023  
-**Erişim:** [Zenodo — zenodo.org/records/7622128](https://zenodo.org/records/7622128)  
+**Kaynak:** TIHM (Technology Integrated Health Management) Veri Seti
+**Yayın:** Palermo ve ark., *Nature Scientific Data*, 2023
+**Erişim:** [Zenodo — zenodo.org/records/7622128](https://zenodo.org/records/7622128)
 **Kurum:** Imperial College London, UK Dementia Research Institute
 
 Veri seti beş ayrı CSV tablosundan oluşmaktadır:
@@ -82,10 +84,18 @@ agitation_model.pkl + model_config.json
 predict.py → predictions.json (56 hasta, 2.722 gün)
          │
          ▼
-Express API (Node.js) ←→ React Arayüzü (Vite)
-  /api/summary            Dashboard — hasta listesi
-  /api/patients           Risk filtreleme ve sıralama
+Express API (Node.js)
+  /api/summary            Kohort özeti
+  /api/patients           Hasta listesi (risk bazlı sıralama)
   /api/patient/:id        Günlük risk zaman serisi + öznitelik tablosu
+         │
+         ├──────────────────────────────┐
+         ▼                              ▼
+React Arayüzü (Vite)          DementIQ Mobil (React Native + Expo)
+  Dashboard — hasta listesi     Dashboard — filtreli hasta listesi
+  Risk filtreleme               PatientDetail — risk grafiği + bakım ipucu
+  Günlük risk zaman serisi      DayDetail — sensör sinyalleri
+                                AlertScreen — uyarı detayları + aksiyon
 ```
 
 ---
@@ -96,8 +106,8 @@ Express API (Node.js) ←→ React Arayüzü (Vite)
 
 Ham aktivite verisi, her hasta için günlük özet satırlarına dönüştürülmüştür. Öznitelikler üç kategoride tanımlanmıştır:
 
-**Hacim öznitelikleri** — günlük toplam hareket miktarı ve zaman dilimine göre dağılımı  
-**Oda bazlı öznitelikler** — Mutfak, Koridor, Oturma Odası, Yatak Odası, Banyo, Ön Kapı, Arka Kapı için ayrı sayımlar  
+**Hacim öznitelikleri** — günlük toplam hareket miktarı ve zaman dilimine göre dağılımı
+**Oda bazlı öznitelikler** — Mutfak, Koridor, Oturma Odası, Yatak Odası, Banyo, Ön Kapı, Arka Kapı için ayrı sayımlar
 **Sapma öznitelikleri (z-skor)** — Her hastanın kendi kişisel ortalama davranışına göre bugünkü sapması
 
 Sapma öznitelikleri projenin en kritik tasarım kararıdır. Hastalar arasındaki bireysel farklılıkları (bir hasta günde 300 hareket yaparken diğeri 80 yapabilir) ortadan kaldırarak modelin genelleştirilmesine olanak tanır.
@@ -152,7 +162,9 @@ Varsayılan 0,50 eşiği ile ajitasyon geri çağırma oranı (recall) yalnızca
 | Makine Öğrenmesi | Python 3.10, scikit-learn, pandas, numpy, imbalanced-learn |
 | Model Serileştirme | joblib |
 | Arka Uç (Backend) | Node.js, Express.js |
-| Ön Uç (Frontend) | React, Vite, React Router, Recharts, Axios |
+| Web Ön Uç | React, Vite, React Router, Recharts, Axios |
+| Mobil Uygulama | React Native, Expo, react-native-svg |
+| LLM Entegrasyonu | Groq API (llama-3.1-8b-instant) — bakım ipucu üretimi |
 | Geliştirme Ortamı | Anaconda, PyCharm, VS Code |
 
 ---
@@ -162,6 +174,7 @@ Varsayılan 0,50 eşiği ile ajitasyon geri çağırma oranı (recall) yalnızca
 ### Ön Koşullar
 - Python 3.10 (Anaconda ortamı)
 - Node.js 18 veya üzeri
+- Expo CLI (`npm install -g expo-cli`)
 - TIHM veri seti CSV dosyaları ([Zenodo](https://zenodo.org/records/7622128)'dan indirin)
 
 ### Adım 1 — Python Ortamını Hazırlama
@@ -192,7 +205,7 @@ npm install
 node server/index.js             # http://localhost:3001 adresinde çalışır
 ```
 
-### Adım 4 — Ön Uç Uygulamasını Başlatma
+### Adım 4 — Web Ön Uç Uygulamasını Başlatma
 
 ```bash
 cd dementia-app/client
@@ -202,6 +215,27 @@ npm run dev                      # http://localhost:5173 adresinde çalışır
 
 Tarayıcıdan `http://localhost:5173` adresine gidildiğinde sistem arayüzü açılır.
 
+### Adım 5 — DementIQ Mobil Uygulamasını Başlatma
+
+```bash
+cd DementIQ
+npm install
+npx expo start
+```
+
+`app.json` dosyasındaki `extra` alanında iki değerin ayarlanması gerekir:
+
+```json
+"extra": {
+  "apiBaseUrl": "http://<bilgisayar-ip-adresi>:3001",
+  "groqApiKey": "<groq-api-anahtari>"
+}
+```
+
+> **Not:** Mobil cihaz ve backend sunucusu aynı ağda olmalıdır. `localhost` yerine yerel IP adresi (örn. `192.168.1.x`) kullanılmalıdır.
+
+Expo Go uygulaması ile QR kod okutularak cihazda çalıştırılabilir.
+
 ---
 
 ## 8. Proje Dizin Yapısı
@@ -209,28 +243,48 @@ Tarayıcıdan `http://localhost:5173` adresine gidildiğinde sistem arayüzü a�
 ```
 dementia-app/
 ├── server/
-│   ├── index.js              # Express API — 3 endpoint
-│   └── predictions.json      # Skorlanmış tahmin verisi
+│   ├── index.js                  # Express API — 3 endpoint
+│   └── predictions.json          # Skorlanmış tahmin verisi
 ├── client/
 │   └── src/
-│       ├── App.jsx            # Yönlendirici (Router)
+│       ├── App.jsx               # Yönlendirici (Router)
 │       ├── pages/
-│       │   ├── Dashboard.jsx  # Hasta listesi ve istatistikler
-│       │   └── PatientView.jsx # Bireysel hasta zaman serisi
+│       │   ├── Dashboard.jsx     # Hasta listesi ve istatistikler
+│       │   └── PatientView.jsx   # Bireysel hasta zaman serisi
 │       └── components/
-│           └── RiskBadge.jsx  # Risk seviyesi rozeti
-├── Datasets/                  # TIHM CSV dosyaları (git'e eklenmez)
-│   ├── Activity.csv
-│   ├── Sleep.csv
-│   ├── Physiology.csv
-│   ├── Labels.csv
-│   └── Demographics.csv
-├── feature_engineering.py     # Öznitelik mühendisliği pipeline'ı
-├── model.py                   # Model eğitimi ve değerlendirme
-├── predict.py                 # Tüm hastaları skorlama
-├── agitation_model.pkl        # Eğitilmiş model (git'e eklenmez)
-├── model_config.json          # Eşik ve öznitelik listesi
-└── daily_features.csv         # Mühendislik çıktısı (git'e eklenmez)
+│           └── RiskBadge.jsx     # Risk seviyesi rozeti
+│
+├── mobile/                         # Mobil uygulama (React Native + Expo)
+│  └── App.js                        # Uygulama giriş noktası, tema sağlayıcı
+│  └── app.json                      # Expo yapılandırması (apiBaseUrl, groqApiKey)
+│  └── src/
+│       ├──navigation/
+│       │   ├── AppNavigator.js       # Stack navigator, başlık yapılandırması
+│       ├──screens/
+│       │   ├── DashboardScreen.js    # Filtreli hasta listesi (HIGH / WATCH / SAFE)
+│       │   ├── PatientDetailScreen.js # Risk grafiği, bakım ipucu, günlük geçmiş
+│       │   ├── DayDetailScreen.js    # Sensör sinyalleri ve sapma etiketleri
+│       │   ├── AlertScreen.js        # Uyarı detayları ve aksiyon butonları
+│       ├──components/
+│       │   ├── RiskChart.js          # Etkileşimli SVG risk grafiği (dokunma desteği)
+│       ├──theme/
+│       │   ├── colors.js             # Risk renk paleti ve yardımcı fonksiyonlar
+│       │   ├── ThemeContext.js       # Açık/koyu tema bağlamı
+│       │   ├── index.js              # Tema dışa aktarımları
+│
+├── Datasets/                         # TIHM CSV dosyaları (git'e eklenmez)
+│  └── Activity.csv
+│  └── Sleep.csv
+│  └── Physiology.csv
+│  └── Labels.csv
+│  └── Demographics.csv
+│
+├── feature_engineering.py            # Öznitelik mühendisliği pipeline'ı
+├── model.py                          # Model eğitimi ve değerlendirme
+├── predict.py                        # Tüm hastaları skorlama
+├── agitation_model.pkl               # Eğitilmiş model (git'e eklenmez)
+├── model_config.json                 # Eşik ve öznitelik listesi
+├── daily_features.csv                # Mühendislik çıktısı (git'e eklenmez)
 ```
 
 ---
@@ -244,6 +298,8 @@ dementia-app/
 **LOPO yerine rastgele bölme kullanılmaması:** Aynı hastanın farklı günlerine ait verilerin eğitim ve test kümelerine rastgele dağıtılması veri sızıntısına (data leakage) yol açar ve gerçekçi olmayan performans metrikleri üretir. LOPO, modeli hiç görmediği bir hasta üzerinde test ederek klinik uygulamayı simüle eder.
 
 **Eşik optimizasyonu:** Klinik bir uyarı sisteminde kaçırılan ajitasyon olayı, yanlış alarmdan çok daha ciddi sonuçlar doğurur. Bu nedenle karar eşiği varsayılan 0,50'den 0,13'e düşürülerek recall %9'dan %79'a yükseltilmiştir.
+
+**DementIQ mobil mimari kararları:** Bakıcı odaklı tasarımda her hasta için tarihsel en yüksek risk skoru yerine uyarı oranı (alert_days / total_days) badge seviyesini belirler; bu yaklaşım anlık risk algısını daha doğru yansıtır. Dokunmaya duyarlı SVG grafiği üzerinde gün seçimi, günlük detay ekranına doğrudan geçiş sağlar. Groq API entegrasyonu, en güncel sensör verisi üzerinden bakıcıya kişiselleştirilmiş günlük bakım ipucu üretir.
 
 ---
 

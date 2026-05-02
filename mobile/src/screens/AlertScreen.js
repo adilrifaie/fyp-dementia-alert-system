@@ -2,6 +2,12 @@ import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { riskColors } from '../theme/colors';
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
 export default function AlertScreen({ route, navigation }) {
   const { day, patientId } = route.params;
   const { theme, isDark } = useTheme();
@@ -30,11 +36,8 @@ export default function AlertScreen({ route, navigation }) {
         {/* Alert Banner */}
         <View style={{
           backgroundColor: isDark ? rc.darkBackground : rc.background,
-          borderRadius: 20,
-          padding: 20,
-          marginBottom: 16,
-          borderWidth: 1,
-          borderColor: rc.primary + '60',
+          borderRadius: 20, padding: 20, marginBottom: 16,
+          borderWidth: 1, borderColor: rc.primary + '60',
           alignItems: 'center',
         }}>
           <Text style={{ fontSize: 36, marginBottom: 8 }}>🚨</Text>
@@ -42,7 +45,7 @@ export default function AlertScreen({ route, navigation }) {
             High Risk Detected
           </Text>
           <Text style={{ fontSize: 13, color: isDark ? rc.darkText : rc.text, fontWeight: '600' }}>
-            Patient {patientId} — {day.date_only}
+            Patient {patientId} — {formatDate(day.date_only)}
           </Text>
           <Text style={{ fontSize: 12, color: isDark ? rc.darkText : rc.text, marginTop: 4, opacity: 0.8 }}>
             Risk Score: {Math.round(day.risk_score * 100)}%
@@ -51,12 +54,8 @@ export default function AlertScreen({ route, navigation }) {
 
         {/* Why triggered */}
         <View style={{
-          backgroundColor: theme.card,
-          borderRadius: 16,
-          padding: 16,
-          marginBottom: 12,
-          borderWidth: 1,
-          borderColor: theme.cardBorder,
+          backgroundColor: theme.card, borderRadius: 16, padding: 16,
+          marginBottom: 12, borderWidth: 1, borderColor: theme.cardBorder,
         }}>
           <Text style={{
             fontSize: 12, fontWeight: '700', color: theme.subtext,
@@ -122,8 +121,7 @@ export default function AlertScreen({ route, navigation }) {
             backgroundColor: 'transparent',
             borderRadius: 14, padding: 16,
             alignItems: 'center', marginBottom: 10,
-            borderWidth: 1.5,
-            borderColor: rc.primary,
+            borderWidth: 1.5, borderColor: rc.primary,
           }}
         >
           <Text style={{ color: rc.primary, fontWeight: '700', fontSize: 15 }}>

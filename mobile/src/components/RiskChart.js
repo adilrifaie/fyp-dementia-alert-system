@@ -5,6 +5,12 @@ import Svg, { Line, Polyline, Text, Circle, Rect, G } from 'react-native-svg';
 const CHART_HEIGHT = 180;
 const THRESHOLD = 0.13;
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
 export default function RiskChart({ days, width, isDark, onDaySelect }) {
   const [activeIndex, setActiveIndex] = useState(null);
 
@@ -181,7 +187,7 @@ export default function RiskChart({ days, width, isDark, onDaySelect }) {
               x={tooltipX + 8} y={tooltipY + 14}
               fontSize="10" fill="#FFFFFF" fontWeight="700"
             >
-              {activeDay.date_only}
+              {formatDate(activeDay.date_only)}
             </Text>
 
             {/* Risk score */}

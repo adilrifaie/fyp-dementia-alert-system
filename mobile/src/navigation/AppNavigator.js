@@ -42,7 +42,7 @@ export default function AppNavigator() {
         <Stack.Screen
           name="DayDetail"
           component={DayDetailScreen}
-          options={({ route }) => ({ title: route.params.day.date_only })}
+          options={({ route }) => { const d = new Date(route.params.day.date_only + 'T00:00:00'); return { title: d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }; }}
         />
         <Stack.Screen
           name="Alert"

@@ -2,6 +2,12 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { getRiskLevel, getRiskLabel, riskColors } from '../theme/colors';
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
 export default function DayDetailScreen({ route, navigation }) {
   const { day, patientId } = route.params;
   const { theme, isDark } = useTheme();
@@ -18,11 +24,11 @@ export default function DayDetailScreen({ route, navigation }) {
 
   const getDeviationLabel = (val) => {
     if (val === null || val === undefined) return { text: 'No data', color: theme.subtext };
-    if (val > 1.5) return { text: 'Much higher than usual', color: riskColors.alert.primary };
-    if (val > 0.5) return { text: 'Slightly elevated', color: riskColors.watch.primary };
-    if (val < -1.5) return { text: 'Much lower than usual', color: riskColors.alert.primary };
-    if (val < -0.5) return { text: 'Slightly reduced', color: riskColors.watch.primary };
-    return { text: 'Within normal range', color: riskColors.safe.primary };
+    if (val > 1.5)  return { text: 'Much higher than usual', color: riskColors.alert.primary };
+    if (val > 0.5)  return { text: 'Slightly elevated',      color: riskColors.watch.primary };
+    if (val < -1.5) return { text: 'Much lower than usual',  color: riskColors.alert.primary };
+    if (val < -0.5) return { text: 'Slightly reduced',       color: riskColors.watch.primary };
+    return           { text: 'Within normal range',          color: riskColors.safe.primary  };
   };
 
   return (
@@ -32,17 +38,14 @@ export default function DayDetailScreen({ route, navigation }) {
         {/* Risk Score Card */}
         <View style={{
           backgroundColor: isDark ? rc.darkBackground : rc.background,
-          borderRadius: 20,
-          padding: 20,
-          marginBottom: 12,
-          borderWidth: 1,
-          borderColor: rc.primary + '40',
+          borderRadius: 20, padding: 20, marginBottom: 12,
+          borderWidth: 1, borderColor: rc.primary + '40',
         }}>
           <Text style={{
             fontSize: 12, fontWeight: '600', letterSpacing: 1,
             color: isDark ? rc.darkText : rc.text, marginBottom: 4,
           }}>
-            {day.date_only}
+            {formatDate(day.date_only)}
           </Text>
 
           <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginBottom: 12 }}>
@@ -62,7 +65,10 @@ export default function DayDetailScreen({ route, navigation }) {
               backgroundColor: day.alert ? rc.primary + '30' : theme.card + '60',
               borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6,
             }}>
-              <Text style={{ fontSize: 12, fontWeight: '700', color: day.alert ? (isDark ? rc.darkText : rc.text) : theme.subtext }}>
+              <Text style={{
+                fontSize: 12, fontWeight: '700',
+                color: day.alert ? (isDark ? rc.darkText : rc.text) : theme.subtext,
+              }}>
                 {day.alert ? '⚠️ ALERT TRIGGERED' : '✓ NO ALERT'}
               </Text>
             </View>
@@ -70,7 +76,10 @@ export default function DayDetailScreen({ route, navigation }) {
               backgroundColor: day.agitation ? rc.primary + '30' : theme.card + '60',
               borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6,
             }}>
-              <Text style={{ fontSize: 12, fontWeight: '700', color: day.agitation ? (isDark ? rc.darkText : rc.text) : theme.subtext }}>
+              <Text style={{
+                fontSize: 12, fontWeight: '700',
+                color: day.agitation ? (isDark ? rc.darkText : rc.text) : theme.subtext,
+              }}>
                 {day.agitation ? '🔴 AGITATION' : '✓ NO AGITATION'}
               </Text>
             </View>
@@ -78,7 +87,10 @@ export default function DayDetailScreen({ route, navigation }) {
         </View>
 
         {/* Sensor Signals */}
-        <Text style={{ fontSize: 12, fontWeight: '700', color: theme.subtext, letterSpacing: 1, marginBottom: 8 }}>
+        <Text style={{
+          fontSize: 12, fontWeight: '700', color: theme.subtext,
+          letterSpacing: 1, marginBottom: 8,
+        }}>
           SENSOR SIGNALS
         </Text>
 
@@ -87,13 +99,9 @@ export default function DayDetailScreen({ route, navigation }) {
           return (
             <View key={f.label} style={{
               backgroundColor: theme.card,
-              borderRadius: 12,
-              padding: 14,
-              marginBottom: 8,
-              borderWidth: 1,
-              borderColor: theme.cardBorder,
-              flexDirection: 'row',
-              alignItems: 'center',
+              borderRadius: 12, padding: 14, marginBottom: 8,
+              borderWidth: 1, borderColor: theme.cardBorder,
+              flexDirection: 'row', alignItems: 'center',
               justifyContent: 'space-between',
             }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -102,12 +110,14 @@ export default function DayDetailScreen({ route, navigation }) {
                   <Text style={{ fontSize: 13, fontWeight: '600', color: theme.text }}>
                     {f.label}
                   </Text>
-                  <Text style={{ fontSize: 11, color: deviation.color, marginTop: 2, fontWeight: '600' }}>
+                  {/* Plain language label is dominant */}
+                  <Text style={{ fontSize: 12, color: deviation.color, marginTop: 2, fontWeight: '700' }}>
                     {deviation.text}
                   </Text>
                 </View>
               </View>
-              <Text style={{ fontSize: 13, fontWeight: '700', color: theme.subtext }}>
+              {/* Raw value is secondary — smaller, muted */}
+              <Text style={{ fontSize: 11, fontWeight: '500', color: theme.subtext }}>
                 {f.value?.toFixed(2) ?? '—'}
               </Text>
             </View>
@@ -120,10 +130,8 @@ export default function DayDetailScreen({ route, navigation }) {
             onPress={() => navigation.navigate('Alert', { day, patientId })}
             style={{
               backgroundColor: riskColors.alert.primary,
-              borderRadius: 14,
-              padding: 16,
-              alignItems: 'center',
-              marginTop: 8,
+              borderRadius: 14, padding: 16,
+              alignItems: 'center', marginTop: 8,
             }}
           >
             <Text style={{ color: '#FFFFFF', fontWeight: '800', fontSize: 15, letterSpacing: 0.5 }}>

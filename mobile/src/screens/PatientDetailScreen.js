@@ -12,6 +12,12 @@ import { useTheme } from "../theme/ThemeContext";
 import { getRiskLevel, getRiskLabel, riskColors } from "../theme/colors";
 import RiskChart from "../components/RiskChart";
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
 export default function PatientDetailScreen({ route, navigation }) {
   const { patientId } = route.params;
   const { apiBaseUrl, groqApiKey } = Constants.expoConfig.extra;
@@ -20,6 +26,7 @@ export default function PatientDetailScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const [careTip, setCareTip] = useState(null);
   const [tipLoading, setTipLoading] = useState(false);
+  const [tipExpanded, setTipExpanded] = useState(false);
   const { width } = useWindowDimensions();
 
   useEffect(() => {
@@ -83,13 +90,7 @@ Give a care tip for the caregiver today.`,
 
   if (loading)
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          backgroundColor: theme.background,
-        }}
-      >
+      <View style={{ flex: 1, justifyContent: "center", backgroundColor: theme.background }}>
         <ActivityIndicator size="large" color={riskColors.watch.primary} />
       </View>
     );
@@ -105,12 +106,11 @@ Give a care tip for the caregiver today.`,
         keyExtractor={(item) => item.date_only}
         ListHeaderComponent={() => (
           <View style={{ padding: 16 }}>
+
             {/* Latest Day Card */}
             <View
               style={{
-                backgroundColor: isDark
-                  ? latestRc.darkBackground
-                  : latestRc.background,
+                backgroundColor: isDark ? latestRc.darkBackground : latestRc.background,
                 borderRadius: 20,
                 padding: 20,
                 marginBottom: 8,
@@ -120,104 +120,47 @@ Give a care tip for the caregiver today.`,
             >
               <Text
                 style={{
-                  fontSize: 12,
-                  fontWeight: "600",
-                  letterSpacing: 1,
+                  fontSize: 12, fontWeight: "600", letterSpacing: 1,
                   color: isDark ? latestRc.darkText : latestRc.text,
                   marginBottom: 4,
                 }}
               >
-                LATEST ENTRY — {latest?.date_only}
+                LATEST ENTRY — {formatDate(latest?.date_only)}
               </Text>
 
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "flex-end",
-                  marginBottom: 12,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 56,
-                    fontWeight: "800",
-                    color: latestRc.primary,
-                    lineHeight: 60,
-                  }}
-                >
+              <View style={{ flexDirection: "row", alignItems: "flex-end", marginBottom: 12 }}>
+                <Text style={{ fontSize: 56, fontWeight: "800", color: latestRc.primary, lineHeight: 60 }}>
                   {Math.round((latest?.risk_score ?? 0) * 100)}
                 </Text>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontWeight: "600",
-                    color: latestRc.primary,
-                    marginBottom: 8,
-                    marginLeft: 4,
-                  }}
-                >
+                <Text style={{ fontSize: 20, fontWeight: "600", color: latestRc.primary, marginBottom: 8, marginLeft: 4 }}>
                   %
                 </Text>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: "700",
-                    color: isDark ? latestRc.darkText : latestRc.text,
-                    marginBottom: 10,
-                    marginLeft: 12,
-                  }}
-                >
+                <Text style={{ fontSize: 16, fontWeight: "700", color: isDark ? latestRc.darkText : latestRc.text, marginBottom: 10, marginLeft: 12 }}>
                   {getRiskLabel(latest?.risk_score ?? 0).toUpperCase()}
                 </Text>
               </View>
 
               <View style={{ flexDirection: "row", gap: 12 }}>
-                <View
-                  style={{
-                    backgroundColor: latest?.alert
-                      ? latestRc.primary + "30"
-                      : theme.card + "60",
-                    borderRadius: 8,
-                    paddingHorizontal: 12,
-                    paddingVertical: 6,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      fontWeight: "700",
-                      color: latest?.alert
-                        ? isDark
-                          ? latestRc.darkText
-                          : latestRc.text
-                        : theme.subtext,
-                    }}
-                  >
+                <View style={{
+                  backgroundColor: latest?.alert ? latestRc.primary + "30" : theme.card + "60",
+                  borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6,
+                }}>
+                  <Text style={{
+                    fontSize: 12, fontWeight: "700",
+                    color: latest?.alert ? (isDark ? latestRc.darkText : latestRc.text) : theme.subtext,
+                  }}>
                     {latest?.alert ? "⚠️ ALERT TRIGGERED" : "✓ NO ALERT"}
                   </Text>
                 </View>
 
-                <View
-                  style={{
-                    backgroundColor: latest?.agitation
-                      ? latestRc.primary + "30"
-                      : theme.card + "60",
-                    borderRadius: 8,
-                    paddingHorizontal: 12,
-                    paddingVertical: 6,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      fontWeight: "700",
-                      color: latest?.agitation
-                        ? isDark
-                          ? latestRc.darkText
-                          : latestRc.text
-                        : theme.subtext,
-                    }}
-                  >
+                <View style={{
+                  backgroundColor: latest?.agitation ? latestRc.primary + "30" : theme.card + "60",
+                  borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6,
+                }}>
+                  <Text style={{
+                    fontSize: 12, fontWeight: "700",
+                    color: latest?.agitation ? (isDark ? latestRc.darkText : latestRc.text) : theme.subtext,
+                  }}>
                     {latest?.agitation ? "🔴 AGITATION" : "✓ NO AGITATION"}
                   </Text>
                 </View>
@@ -225,122 +168,80 @@ Give a care tip for the caregiver today.`,
             </View>
 
             {/* Risk Chart */}
-            <View
-              style={{
-                backgroundColor: theme.card,
-                borderRadius: 16,
-                padding: 16,
-                marginBottom: 8,
-                borderWidth: 1,
-                borderColor: theme.cardBorder,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: "700",
-                  color: theme.subtext,
-                  letterSpacing: 0.5,
-                  marginBottom: 12,
-                }}
-              >
+            <View style={{
+              backgroundColor: theme.card,
+              borderRadius: 16, padding: 16, marginBottom: 8,
+              borderWidth: 1, borderColor: theme.cardBorder,
+            }}>
+              <Text style={{
+                fontSize: 12, fontWeight: "700", color: theme.subtext,
+                letterSpacing: 0.5, marginBottom: 12,
+              }}>
                 📈 DAILY RISK SCORE
               </Text>
               <RiskChart
                 days={days}
                 width={width}
                 isDark={isDark}
-                onDaySelect={(day) =>
-                  navigation.navigate("DayDetail", { day, patientId })
-                }
+                onDaySelect={(day) => navigation.navigate("DayDetail", { day, patientId })}
               />
               <View style={{ flexDirection: "row", gap: 16, marginTop: 8 }}>
-                <View
-                  style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
-                >
-                  <View
-                    style={{ width: 12, height: 2, backgroundColor: "#3B82F6" }}
-                  />
-                  <Text style={{ fontSize: 10, color: theme.subtext }}>
-                    Risk score
-                  </Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                  <View style={{ width: 12, height: 2, backgroundColor: "#3B82F6" }} />
+                  <Text style={{ fontSize: 10, color: theme.subtext }}>Risk score</Text>
                 </View>
-                <View
-                  style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
-                >
-                  <View
-                    style={{ width: 12, height: 2, backgroundColor: "#F59E0B" }}
-                  />
-                  <Text style={{ fontSize: 10, color: theme.subtext }}>
-                    Threshold (13%)
-                  </Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                  <View style={{ width: 12, height: 2, backgroundColor: "#F59E0B" }} />
+                  <Text style={{ fontSize: 10, color: theme.subtext }}>Threshold (13%)</Text>
                 </View>
-                <View
-                  style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
-                >
-                  <View
-                    style={{ width: 2, height: 10, backgroundColor: "#EF4444" }}
-                  />
-                  <Text style={{ fontSize: 10, color: theme.subtext }}>
-                    Agitation day
-                  </Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                  <View style={{ width: 2, height: 10, backgroundColor: "#EF4444" }} />
+                  <Text style={{ fontSize: 10, color: theme.subtext }}>Agitation day</Text>
                 </View>
               </View>
             </View>
 
-            {/* Care Tip Card */}
-            <View
-              style={{
-                backgroundColor: theme.card,
-                borderRadius: 16,
-                padding: 16,
-                marginBottom: 8,
-                borderWidth: 1,
-                borderColor: theme.cardBorder,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: "700",
-                  color: theme.subtext,
-                  letterSpacing: 0.5,
-                  marginBottom: 6,
-                }}
-              >
+            {/* Care Tip Card — 2-line cap with expand */}
+            <View style={{
+              backgroundColor: theme.card,
+              borderRadius: 16, padding: 16, marginBottom: 8,
+              borderWidth: 1, borderColor: theme.cardBorder,
+            }}>
+              <Text style={{
+                fontSize: 12, fontWeight: "700", color: theme.subtext,
+                letterSpacing: 0.5, marginBottom: 6,
+              }}>
                 💡 CARE TIP
               </Text>
+
               {tipLoading ? (
-                <View
-                  style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
-                >
-                  <ActivityIndicator
-                    size="small"
-                    color={riskColors.watch.primary}
-                  />
-                  <Text style={{ fontSize: 13, color: theme.subtext }}>
-                    Generating tip...
-                  </Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <ActivityIndicator size="small" color={riskColors.watch.primary} />
+                  <Text style={{ fontSize: 13, color: theme.subtext }}>Generating tip...</Text>
                 </View>
               ) : (
-                <Text
-                  style={{ fontSize: 14, color: theme.text, lineHeight: 20 }}
-                >
-                  {careTip ?? "No tip available."}
-                </Text>
+                <>
+                  <Text
+                    numberOfLines={tipExpanded ? undefined : 2}
+                    style={{ fontSize: 14, color: theme.text, lineHeight: 22 }}
+                  >
+                    {careTip ?? "No tip available."}
+                  </Text>
+                  {careTip && careTip.length > 100 && (
+                    <TouchableOpacity onPress={() => setTipExpanded(prev => !prev)} style={{ marginTop: 6 }}>
+                      <Text style={{ fontSize: 12, color: '#3B82F6', fontWeight: '600' }}>
+                        {tipExpanded ? 'Show less' : 'Read more'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </>
               )}
             </View>
 
-            <Text
-              style={{
-                fontSize: 12,
-                fontWeight: "700",
-                color: theme.subtext,
-                letterSpacing: 1,
-                marginTop: 8,
-                marginBottom: 8,
-              }}
-            >
+            <Text style={{
+              fontSize: 12, fontWeight: "700", color: theme.subtext,
+              letterSpacing: 1, marginTop: 8, marginBottom: 8,
+            }}>
               DAILY HISTORY
             </Text>
           </View>
@@ -351,60 +252,35 @@ Give a care tip for the caregiver today.`,
 
           return (
             <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("DayDetail", { day: item, patientId })
-              }
+              onPress={() => navigation.navigate("DayDetail", { day: item, patientId })}
               activeOpacity={0.7}
               style={{
-                marginHorizontal: 16,
-                marginBottom: 6,
+                marginHorizontal: 16, marginBottom: 6,
                 backgroundColor: theme.card,
-                borderRadius: 12,
-                padding: 14,
+                borderRadius: 12, padding: 14,
                 borderWidth: 1,
                 borderColor: item.alert ? rc.primary + "60" : theme.cardBorder,
-                flexDirection: "row",
-                alignItems: "center",
+                flexDirection: "row", alignItems: "center",
                 justifyContent: "space-between",
               }}
             >
               <View>
-                <Text
-                  style={{ fontSize: 14, fontWeight: "600", color: theme.text }}
-                >
-                  {item.date_only}
+                <Text style={{ fontSize: 14, fontWeight: "600", color: theme.text }}>
+                  {formatDate(item.date_only)}
                 </Text>
                 <View style={{ flexDirection: "row", gap: 8, marginTop: 4 }}>
                   {item.alert === 1 && (
-                    <Text
-                      style={{
-                        fontSize: 11,
-                        color: riskColors.alert.primary,
-                        fontWeight: "600",
-                      }}
-                    >
+                    <Text style={{ fontSize: 11, color: riskColors.alert.primary, fontWeight: "600" }}>
                       ⚠️ Alert
                     </Text>
                   )}
                   {item.agitation === 1 && (
-                    <Text
-                      style={{
-                        fontSize: 11,
-                        color: riskColors.alert.primary,
-                        fontWeight: "600",
-                      }}
-                    >
+                    <Text style={{ fontSize: 11, color: riskColors.alert.primary, fontWeight: "600" }}>
                       🔴 Agitation
                     </Text>
                   )}
                   {item.alert === 0 && item.agitation === 0 && (
-                    <Text
-                      style={{
-                        fontSize: 11,
-                        color: riskColors.safe.primary,
-                        fontWeight: "600",
-                      }}
-                    >
+                    <Text style={{ fontSize: 11, color: riskColors.safe.primary, fontWeight: "600" }}>
                       ✓ Clear
                     </Text>
                   )}
@@ -412,14 +288,10 @@ Give a care tip for the caregiver today.`,
               </View>
 
               <View style={{ alignItems: "flex-end" }}>
-                <Text
-                  style={{ fontSize: 22, fontWeight: "800", color: rc.primary }}
-                >
+                <Text style={{ fontSize: 22, fontWeight: "800", color: rc.primary }}>
                   {Math.round(item.risk_score * 100)}%
                 </Text>
-                <Text
-                  style={{ fontSize: 11, color: theme.subtext, marginTop: 2 }}
-                >
+                <Text style={{ fontSize: 11, color: theme.subtext, marginTop: 2 }}>
                   {getRiskLabel(item.risk_score)}
                 </Text>
               </View>

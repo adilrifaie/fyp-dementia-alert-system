@@ -1,44 +1,70 @@
-# Ev Ortamında Demans Bakımı İçin Davranışsal Tespit ve Uyarı Sistemi
+# 🧠 DementIQ — Ev Ortamında Demans Bakımı İçin Davranışsal Tespit ve Uyarı Sistemi
+
+> Demans hastalarının günlük sensör verilerini analiz ederek bakıcıya sabah ajitasyon riski sunan yapay zeka destekli sistem.
 
 ---
 
-## İçindekiler
+## 🎬 Demo
+
+[![DementIQ Demo](https://img.youtube.com/vi/xGd2jyL4Srg/0.jpg)](https://youtube.com/shorts/xGd2jyL4Srg?si=37_ySdQcovNtK6oP)
+
+▶️ [YouTube'da izle](https://youtube.com/shorts/xGd2jyL4Srg?si=37_ySdQcovNtK6oP)
+
+---
+
+## 📱 Ekran Görüntüleri
+
+| Dashboard | Hasta Detay | Gün Detay | Uyarı Sayfası |
+|-----------|-------------|-----------| ------------- |
+| ![Dashboard](screenshots/dashboard.jpg) | ![PatientDetail](screenshots/patient_detail.jpg) | ![DayDetail](screenshots/day_detail.jpg) | ![Alert](screenshots/warning.jpg)
+
+---
+
+## 📋 İçindekiler
 
 1. [Proje Hakkında](#1-proje-hakkında)
-2. [Veri Seti](#2-veri-seti)
-3. [Sistem Mimarisi](#3-sistem-mimarisi)
-4. [Makine Öğrenmesi Yaklaşımı](#4-makine-öğrenmesi-yaklaşımı)
-5. [Model Performansı](#5-model-performansı)
-6. [Teknoloji Yığını](#6-teknoloji-yığını)
-7. [Kurulum ve Çalıştırma](#7-kurulum-ve-çalıştırma)
-8. [Proje Dizin Yapısı](#8-proje-dizin-yapısı)
-9. [Önemli Tasarım Kararları](#9-önemli-tasarım-kararları)
+2. [Neden Bu Proje?](#2-neden-bu-proje)
+3. [Veri Seti](#3-veri-seti)
+4. [Sistem Mimarisi](#4-sistem-mimarisi)
+5. [Makine Öğrenmesi Yaklaşımı](#5-makine-öğrenmesi-yaklaşımı)
+6. [Model Performansı](#6-model-performansı)
+7. [Teknoloji Yığını](#7-teknoloji-yığını)
+8. [Kurulum ve Çalıştırma](#8-kurulum-ve-çalıştırma)
+9. [Proje Dizin Yapısı](#9-proje-dizin-yapısı)
+10. [Önemli Tasarım Kararları](#10-önemli-tasarım-kararları)
 
 ---
 
 ## 1. Proje Hakkında
 
-Bu proje, demans hastası bireylerin ev içi hareket sensörü verilerini analiz ederek **ajitasyon (agitation) riskini günlük bazda tahmin eden** bir erken uyarı sistemi geliştirmeyi amaçlamaktadır.
+DementIQ, demans hastası bireylerin ev içi hareket sensörü verilerini makine öğrenmesiyle analiz ederek **günlük ajitasyon riski** sunan bir erken uyarı sistemidir.
 
-Demans hastalarında ajitasyon, bakım verenler için en zorlu durumlardan biridir ve önceden tespit edilmesi hem hasta güvenliğini hem de bakım kalitesini doğrudan etkiler. Bu sistem, ev içine yerleştirilen pasif kızılötesi (PIR) hareket sensörlerinden elde edilen anonim veri üzerinde makine öğrenmesi modeli çalıştırarak her hasta için günlük risk skoru üretmekte ve belirli bir eşik değerinin üzerinde risk tespit edildiğinde uyarı oluşturmaktadır.
-
-**Projenin katkısı üç katmanda özetlenebilir:**
-- Ham sensör verilerinden klinik açıdan anlamlı davranışsal özniteliklerin çıkarılması
+**Sistem üç katmanda çalışır:**
+- Ham sensör verisinden klinik açıdan anlamlı davranışsal özniteliklerin çıkarılması
 - Hastaya özgü temel çizgi normalizasyonu ile kişiselleştirilmiş risk değerlendirmesi
-- Gerçek zamanlı izleme ve uyarı sunan tam yığın (full-stack) web uygulaması ve mobil uygulama
+- Bakıcıya o günkü riski ve bakım ipucunu tek ekranda sunan mobil uygulama
 
-**DementIQ** — projenin mobil arayüzü — React Native ve Expo ile geliştirilmiş olup bakıcılara hasta risk skorlarını, günlük sensör sinyallerini ve Groq LLM tabanlı bakım ipuçlarını tek bir ekrandan sunar.
+Bakıcı sabah uyandığında uygulamayı açar, hastasının risk seviyesini (YÜKSEK / İZLE / GÜVENLİ) ve o güne özel yapay zeka destekli bakım ipucunu görür. Tedavi değil — **erken farkındalık** hedeflenir.
 
 ---
 
-## 2. Veri Seti
+## 2. Neden Bu Proje?
 
-**Kaynak:** TIHM (Technology Integrated Health Management) Veri Seti
-**Yayın:** Palermo ve ark., *Nature Scientific Data*, 2023
-**Erişim:** [Zenodo — zenodo.org/records/7622128](https://zenodo.org/records/7622128)
+Demans hastaları ajitasyon krizleri yaşadığında bakıcılar çoğunlukla hazırlıksız yakalanır. Mevcut sistemler ya gerçek zamanlı izleme gerektirir (yüksek donanım maliyeti) ya da klinisyen müdahalesine bağımlıdır (günlük bakımda ölçeklenemez).
+
+Bu proje, açık erişimli gerçek hasta verisi (TIHM, Imperial College London) ve makine öğrenmesi araçlarıyla bu boşluğu kapatan bakıcı odaklı bir yazılım çözümü sunmaktadır.
+
+**Başarı kriteri:** Ajitasyon vakalarının en az %70'inin önceden tespit edilmesi.
+**Mevcut performans:** %79 recall — kriter karşılandı.
+
+---
+
+## 3. Veri Seti
+
+**Kaynak:** TIHM (Technology Integrated Health Management) Veri Seti  
+**Yayın:** Palermo ve ark., *Nature Scientific Data*, 2023  
+**Erişim:** [Zenodo — zenodo.org/records/7622128](https://zenodo.org/records/7622128)  
 **Kurum:** Imperial College London, UK Dementia Research Institute
-
-Veri seti beş ayrı CSV tablosundan oluşmaktadır:
 
 | Tablo | İçerik | Satır Sayısı |
 |-------|--------|-------------|
@@ -49,13 +75,13 @@ Veri seti beş ayrı CSV tablosundan oluşmaktadır:
 | `Demographics.csv` | Hasta demografik bilgileri | 56 |
 
 **Ön analiz bulguları:**
-- `Labels.type` incelendiğinde yalnızca **Ajitasyon** (135 olay) gerçek davranışsal etiket olarak tanımlanmıştır; diğer etiketler fizyoloji ölçümlerinin yanlış sınıflandırılmasından kaynaklanmaktadır.
-- Uyku verisi yalnızca 17 hastayı kapsamakta, bunlardan ajitasyon etiketi olan hastalarla kesişim yalnızca 6 hastaya düşmektedir. Bu nedenle uyku verisi kapsam dışı bırakılmıştır.
-- Aktivite verisi ile eşleştirme sonrası 134/135 ajitasyon olayı kullanılabilir durumdadır.
+- `Labels.type` incelendiğinde yalnızca **Ajitasyon** (135 olay) gerçek davranışsal etiket olarak tanımlanmıştır.
+- Uyku verisi yalnızca 17 hastayı kapsamakta, ajitasyon etiketi olan hastalarla kesişim yalnızca 6 hastaya düşmektedir — kapsam dışı bırakıldı.
+- Aktivite verisiyle eşleştirme sonrası 134/135 ajitasyon olayı kullanılabilir durumdadır.
 
 ---
 
-## 3. Sistem Mimarisi
+## 4. Sistem Mimarisi
 
 ```
 Ham Veri (Activity.csv)
@@ -74,7 +100,7 @@ daily_features.csv (2.722 satır — hasta × gün)
 model.py
   - Random Forest sınıflandırıcı
   - SMOTE ile sınıf dengesizliği giderimi
-  - LOPO (Leave-One-Patient-Out) çapraz doğrulama
+  - LOPO çapraz doğrulama
   - Eşik optimizasyonu (0,50 → 0,13)
          │
          ▼
@@ -85,58 +111,56 @@ predict.py → predictions.json (56 hasta, 2.722 gün)
          │
          ▼
 Express API (Node.js)
-  /api/summary            Kohort özeti
-  /api/patients           Hasta listesi (risk bazlı sıralama)
-  /api/patient/:id        Günlük risk zaman serisi + öznitelik tablosu
+  /api/summary       — Kohort özeti
+  /api/patients      — Hasta listesi (risk bazlı sıralama)
+  /api/patient/:id   — Günlük risk zaman serisi + öznitelik tablosu
          │
-         ├──────────────────────────────┐
-         ▼                              ▼
-React Arayüzü (Vite)          DementIQ Mobil (React Native + Expo)
-  Dashboard — hasta listesi     Dashboard — filtreli hasta listesi
-  Risk filtreleme               PatientDetail — risk grafiği + bakım ipucu
-  Günlük risk zaman serisi      DayDetail — sensör sinyalleri
-                                AlertScreen — uyarı detayları + aksiyon
+         ├──────────────────────────────────────┐
+         ▼                                      ▼
+React Arayüzü (Vite)               DementIQ Mobil (React Native + Expo)
+  Dashboard — hasta listesi          Dashboard — filtreli hasta listesi
+  Risk filtreleme                    PatientDetail — risk grafiği + bakım ipucu
+  Günlük risk zaman serisi           DayDetail — sensör sinyalleri
+                                     AlertScreen — uyarı detayları + aksiyon
 ```
 
 ---
 
-## 4. Makine Öğrenmesi Yaklaşımı
+## 5. Makine Öğrenmesi Yaklaşımı
 
-### 4.1 Öznitelik Mühendisliği
+### 5.1 Öznitelik Mühendisliği
 
-Ham aktivite verisi, her hasta için günlük özet satırlarına dönüştürülmüştür. Öznitelikler üç kategoride tanımlanmıştır:
+Ham aktivite verisi, her hasta için günlük özet satırlarına dönüştürülmüştür:
 
-**Hacim öznitelikleri** — günlük toplam hareket miktarı ve zaman dilimine göre dağılımı
-**Oda bazlı öznitelikler** — Mutfak, Koridor, Oturma Odası, Yatak Odası, Banyo, Ön Kapı, Arka Kapı için ayrı sayımlar
-**Sapma öznitelikleri (z-skor)** — Her hastanın kendi kişisel ortalama davranışına göre bugünkü sapması
+- **Hacim öznitelikleri** — günlük toplam hareket miktarı ve zaman dilimine göre dağılımı
+- **Oda bazlı öznitelikler** — Mutfak, Koridor, Oturma Odası, Yatak Odası, Banyo, Ön Kapı, Arka Kapı
+- **Sapma öznitelikleri (z-skor)** — her hastanın kendi kişisel ortalamasına göre bugünkü sapması
 
-Sapma öznitelikleri projenin en kritik tasarım kararıdır. Hastalar arasındaki bireysel farklılıkları (bir hasta günde 300 hareket yaparken diğeri 80 yapabilir) ortadan kaldırarak modelin genelleştirilmesine olanak tanır.
+Sapma öznitelikleri projenin en kritik tasarım kararıdır. Hastalar arası bireysel farklılıkları ortadan kaldırarak modelin genelleşmesine olanak tanır.
 
-### 4.2 Model Seçimi
+### 5.2 Model Seçimi — Random Forest
 
-Tablo verisi için **Random Forest** tercih edilmiştir. Gerekçeleri:
 - Doğrusal olmayan ilişkileri modelleyebilme
 - Öznitelik önem derecesi çıktısı (klinik yorum için kritik)
 - Gürültülü özniteliklere karşı dayanıklılık
-- Hiperparametre ayarı gerektirmeden makul performans
 
-### 4.3 Değerlendirme Yöntemi
+### 5.3 Değerlendirme — LOPO (Leave-One-Patient-Out)
 
-**Leave-One-Patient-Out (LOPO) Çapraz Doğrulama** kullanılmıştır. Rastgele veri bölme yöntemi bu veri seti için uygun değildir; zira aynı hastanın farklı günlerine ait veriler eğitim ve test kümelerine karışırsa model genelleşme değil ezber yapar. LOPO, her adımda bir hastayı dışarıda bırakarak modelin hiç görmediği bir hasta üzerinde test edilmesini sağlar.
+Rastgele bölme bu veri setinde veri sızıntısına (data leakage) yol açar — aynı hastanın farklı günleri hem eğitim hem teste karışır. LOPO, modeli hiç görmediği bir hasta üzerinde test ederek klinik uygulamayı simüle eder.
 
-### 4.4 Sınıf Dengesizliği
+### 5.4 Sınıf Dengesizliği
 
-Pozitif oran yaklaşık %4,2 (114 ajitasyon günü / 2.722 toplam gün) olup bu ciddi bir sınıf dengesizliği problemidir. Çözüm için iki yöntem birlikte uygulanmıştır:
-- **SMOTE** (Synthetic Minority Oversampling Technique) — eğitim verisinde sentetik ajitasyon örnekleri üretir
+Pozitif oran yaklaşık %4,2 (114 ajitasyon günü / 2.722 toplam gün). İki yöntem birlikte uygulandı:
+- **SMOTE** — eğitim verisinde sentetik ajitasyon örnekleri üretir
 - **class_weight='balanced'** — model kaybında azınlık sınıfını ağırlıklandırır
 
-### 4.5 Eşik Optimizasyonu
+### 5.5 Eşik Optimizasyonu
 
-Varsayılan 0,50 eşiği ile ajitasyon geri çağırma oranı (recall) yalnızca %9'dur. Precision-Recall eğrisi analizi sonrası optimal eşik **0,13** olarak belirlenmiş, recall %79'a yükseltilmiştir. Klinik bir uyarı sisteminde kaçırılan ajitasyon olayının maliyeti yanlış alarm maliyetinden çok daha yüksektir; bu nedenle yüksek recall önceliklendirilmiştir.
+Varsayılan 0,50 eşiğiyle recall yalnızca %9'dur. Precision-Recall analizi sonrası eşik **0,13** olarak belirlendi — recall **%79**'a yükseldi. Kaçırılan ajitasyonun maliyeti yanlış alarmdan çok daha yüksektir; bu nedenle yüksek recall önceliklendirildi.
 
 ---
 
-## 5. Model Performansı
+## 6. Model Performansı
 
 | Metrik | Değer | Açıklama |
 |--------|-------|----------|
@@ -145,23 +169,25 @@ Varsayılan 0,50 eşiği ile ajitasyon geri çağırma oranı (recall) yalnızca
 | Ajitasyon Precision | %11 | Uyarıların gerçek ajitasyona isabet oranı |
 | Optimal Eşik | 0,13 | F1 maksimizasyonuyla belirlenen karar sınırı |
 
-**En öngörülü öznitelikler (Random Forest önem sıralaması):**
+**En öngörülü öznitelikler:**
 
-1. `dev_Hallway` — Koridor hareketlerindeki sapma (0,133)
-2. `dev_total_movements` — Toplam hareket sapması (0,105)
-3. `dev_first_movement_hour` — İlk hareket saatindeki sapma (0,088)
-4. `dev_Kitchen` — Mutfak hareketlerindeki sapma (0,084)
-5. `dev_Lounge` — Oturma odası hareketlerindeki sapma (0,083)
+| Sıra | Öznitelik | Önem |
+|------|-----------|------|
+| 1 | `dev_Hallway` — Koridor sapması | 0,133 |
+| 2 | `dev_total_movements` — Toplam hareket sapması | 0,105 |
+| 3 | `dev_first_movement_hour` — İlk hareket saati sapması | 0,088 |
+| 4 | `dev_Kitchen` — Mutfak sapması | 0,084 |
+| 5 | `dev_Lounge` — Oturma odası sapması | 0,083 |
 
 ---
 
-## 6. Teknoloji Yığını
+## 7. Teknoloji Yığını
 
 | Katman | Teknoloji |
 |--------|-----------|
 | Makine Öğrenmesi | Python 3.10, scikit-learn, pandas, numpy, imbalanced-learn |
 | Model Serileştirme | joblib |
-| Arka Uç (Backend) | Node.js, Express.js |
+| Arka Uç | Node.js, Express.js |
 | Web Ön Uç | React, Vite, React Router, Recharts, Axios |
 | Mobil Uygulama | React Native, Expo, react-native-svg |
 | LLM Entegrasyonu | Groq API (llama-3.1-8b-instant) — bakım ipucu üretimi |
@@ -169,7 +195,7 @@ Varsayılan 0,50 eşiği ile ajitasyon geri çağırma oranı (recall) yalnızca
 
 ---
 
-## 7. Kurulum ve Çalıştırma
+## 8. Kurulum ve Çalıştırma
 
 ### Ön Koşullar
 - Python 3.10 (Anaconda ortamı)
@@ -186,9 +212,9 @@ conda install numpy pandas scikit-learn -c conda-forge -y
 pip install imbalanced-learn joblib
 ```
 
-### Adım 2 — Makine Öğrenmesi Pipeline'ını Çalıştırma
+### Adım 2 — ML Pipeline'ını Çalıştırma
 
-CSV dosyaları `Datasets/` klasörüne yerleştirildikten sonra sırasıyla:
+CSV dosyalarını `Datasets/` klasörüne yerleştirdikten sonra:
 
 ```bash
 python feature_engineering.py   # daily_features.csv oluşturur
@@ -196,26 +222,24 @@ python model.py                  # modeli eğitir, agitation_model.pkl kaydeder
 python predict.py                # tüm hastaları skorlar, predictions.json kaydeder
 ```
 
-### Adım 3 — Arka Uç Sunucusunu Başlatma
+### Adım 3 — Backend Sunucusu
 
 ```bash
 cp predictions.json server/
 cd dementia-app
 npm install
-node server/index.js             # http://localhost:3001 adresinde çalışır
+node server/index.js             # http://localhost:3001
 ```
 
-### Adım 4 — Web Ön Uç Uygulamasını Başlatma
+### Adım 4 — Web Arayüzü
 
 ```bash
 cd dementia-app/client
 npm install
-npm run dev                      # http://localhost:5173 adresinde çalışır
+npm run dev                      # http://localhost:5173
 ```
 
-Tarayıcıdan `http://localhost:5173` adresine gidildiğinde sistem arayüzü açılır.
-
-### Adım 5 — DementIQ Mobil Uygulamasını Başlatma
+### Adım 5 — DementIQ Mobil Uygulama
 
 ```bash
 cd DementIQ
@@ -223,7 +247,7 @@ npm install
 npx expo start
 ```
 
-`app.json` dosyasındaki `extra` alanında iki değerin ayarlanması gerekir:
+`app.json` dosyasındaki `extra` alanını güncelleyin:
 
 ```json
 "extra": {
@@ -232,13 +256,11 @@ npx expo start
 }
 ```
 
-> **Not:** Mobil cihaz ve backend sunucusu aynı ağda olmalıdır. `localhost` yerine yerel IP adresi (örn. `192.168.1.x`) kullanılmalıdır.
-
-Expo Go uygulaması ile QR kod okutularak cihazda çalıştırılabilir.
+> **Not:** Mobil cihaz ve backend aynı ağda olmalıdır. `localhost` yerine yerel IP adresi kullanın (örn. `192.168.1.x`). Expo Go ile QR kod okutularak çalıştırılabilir.
 
 ---
 
-## 8. Proje Dizin Yapısı
+## 9. Proje Dizin Yapısı
 
 ```
 dementia-app/
@@ -247,60 +269,65 @@ dementia-app/
 │   └── predictions.json          # Skorlanmış tahmin verisi
 ├── client/
 │   └── src/
-│       ├── App.jsx               # Yönlendirici (Router)
+│       ├── App.jsx
 │       ├── pages/
-│       │   ├── Dashboard.jsx     # Hasta listesi ve istatistikler
-│       │   └── PatientView.jsx   # Bireysel hasta zaman serisi
+│       │   ├── Dashboard.jsx
+│       │   └── PatientView.jsx
 │       └── components/
-│           └── RiskBadge.jsx     # Risk seviyesi rozeti
+│           └── RiskBadge.jsx
 │
-├── mobile/                         # Mobil uygulama (React Native + Expo)
-│  └── App.js                        # Uygulama giriş noktası, tema sağlayıcı
-│  └── app.json                      # Expo yapılandırması (apiBaseUrl, groqApiKey)
-│  └── src/
-│       ├──navigation/
-│       │   ├── AppNavigator.js       # Stack navigator, başlık yapılandırması
-│       ├──screens/
-│       │   ├── DashboardScreen.js    # Filtreli hasta listesi (HIGH / WATCH / SAFE)
-│       │   ├── PatientDetailScreen.js # Risk grafiği, bakım ipucu, günlük geçmiş
-│       │   ├── DayDetailScreen.js    # Sensör sinyalleri ve sapma etiketleri
-│       │   ├── AlertScreen.js        # Uyarı detayları ve aksiyon butonları
-│       ├──components/
-│       │   ├── RiskChart.js          # Etkileşimli SVG risk grafiği (dokunma desteği)
-│       ├──theme/
-│       │   ├── colors.js             # Risk renk paleti ve yardımcı fonksiyonlar
-│       │   ├── ThemeContext.js       # Açık/koyu tema bağlamı
-│       │   ├── index.js              # Tema dışa aktarımları
+DementIQ/                         # Mobil uygulama (React Native + Expo)
+├── App.js
+├── app.json                      # apiBaseUrl, groqApiKey
+└── src/
+    ├── navigation/
+    │   └── AppNavigator.js
+    ├── screens/
+    │   ├── DashboardScreen.js
+    │   ├── PatientDetailScreen.js
+    │   ├── DayDetailScreen.js
+    │   └── AlertScreen.js
+    ├── components/
+    │   └── RiskChart.js
+    └── theme/
+        ├── colors.js
+        ├── ThemeContext.js
+        └── index.js
 │
-├── Datasets/                         # TIHM CSV dosyaları (git'e eklenmez)
-│  └── Activity.csv
-│  └── Sleep.csv
-│  └── Physiology.csv
-│  └── Labels.csv
-│  └── Demographics.csv
-│
-├── feature_engineering.py            # Öznitelik mühendisliği pipeline'ı
-├── model.py                          # Model eğitimi ve değerlendirme
-├── predict.py                        # Tüm hastaları skorlama
-├── agitation_model.pkl               # Eğitilmiş model (git'e eklenmez)
-├── model_config.json                 # Eşik ve öznitelik listesi
-├── daily_features.csv                # Mühendislik çıktısı (git'e eklenmez)
+Datasets/                         # TIHM CSV dosyaları (git'e eklenmez)
+feature_engineering.py
+model.py
+predict.py
+agitation_model.pkl               # (git'e eklenmez)
+model_config.json
+daily_features.csv                # (git'e eklenmez)
 ```
 
 ---
 
-## 9. Önemli Tasarım Kararları
+## 10. Önemli Tasarım Kararları
 
-**Uyku verisinin kapsam dışı bırakılması:** Uyku verisi yalnızca 17 hastayı kapsamakta olup ajitasyon etiketi bulunan hastalarla kesişimi yalnızca 6 hastadır. Bu büyüklükte bir alt kümeden anlamlı öznitelik çıkarmak mümkün değildir; bu nedenle model yalnızca aktivite verisi üzerine kurulmuştur.
+**Uyku verisinin kapsam dışı bırakılması:** Yalnızca 6 hastayla ajitasyon etiketi kesişimi olan uyku verisinden anlamlı öznitelik çıkarmak mümkün değildir.
 
-**Hasta bazlı z-skor normalizasyonu:** Ham hareket sayıları hastalar arasında karşılaştırılamaz. Z-skor normalizasyonu, her özniteliği hastanın kendi geçmiş ortalamasına göre ifade ederek modelin bireysel davranış profillerini öğrenmesini sağlar.
+**Z-skor normalizasyonu:** Ham hareket sayıları hastalar arasında karşılaştırılamaz. Z-skor, her özniteliği hastanın kendi geçmiş ortalamasına göre ifade ederek modelin bireysel davranış profillerini öğrenmesini sağlar.
 
-**LOPO yerine rastgele bölme kullanılmaması:** Aynı hastanın farklı günlerine ait verilerin eğitim ve test kümelerine rastgele dağıtılması veri sızıntısına (data leakage) yol açar ve gerçekçi olmayan performans metrikleri üretir. LOPO, modeli hiç görmediği bir hasta üzerinde test ederek klinik uygulamayı simüle eder.
+**LOPO zorunluluğu:** Rastgele bölme veri sızıntısına yol açar. LOPO, klinik uygulamayı doğru simüle eden tek değerlendirme yöntemidir.
 
-**Eşik optimizasyonu:** Klinik bir uyarı sisteminde kaçırılan ajitasyon olayı, yanlış alarmdan çok daha ciddi sonuçlar doğurur. Bu nedenle karar eşiği varsayılan 0,50'den 0,13'e düşürülerek recall %9'dan %79'a yükseltilmiştir.
+**Eşik optimizasyonu:** Kaçırılan ajitasyon olayı yanlış alarmdan çok daha ciddi sonuçlar doğurur. Eşik 0,50'den 0,13'e düşürülerek recall %9'dan %79'a yükseltildi.
 
-**DementIQ mobil mimari kararları:** Bakıcı odaklı tasarımda her hasta için tarihsel en yüksek risk skoru yerine uyarı oranı (alert_days / total_days) badge seviyesini belirler; bu yaklaşım anlık risk algısını daha doğru yansıtır. Dokunmaya duyarlı SVG grafiği üzerinde gün seçimi, günlük detay ekranına doğrudan geçiş sağlar. Groq API entegrasyonu, en güncel sensör verisi üzerinden bakıcıya kişiselleştirilmiş günlük bakım ipucu üretir.
+**Badge hesabı:** Geçmişteki en yüksek risk skoru yerine `alert_days / total_days` oranı kullanılır — anlık risk algısını daha doğru yansıtır.
+
+**Care Tip mimarisi:** Groq API, en güncel sensör verisi üzerinden bakıcıya kişiselleştirilmiş günlük bakım ipucu üretir.
 
 ---
 
-*Bu proje YZM310 Bitirme Projesi 1 kapsamında geliştirilmiştir. Veri seti araştırma amaçlı kullanım için kamuya açık olup Imperial College London ve Surrey and Borders Partnership NHS Foundation Trust tarafından sağlanmıştır.*
+## 📎 Bağlantılar
+
+- 🎬 [Demo Video](https://youtube.com/shorts/xGd2jyL4Srg?si=37_ySdQcovNtK6oP)
+- 📊 [TIHM Veri Seti (Zenodo)](https://zenodo.org/records/7622128)
+- 🏆 [GNEC Hackathon 2026 — Devpost](https://devpost.com/software/dementiq)
+
+---
+
+*YZM310 Bitirme Projesi 1 — Samsun Üniversitesi — 2026*  
+*Veri seti araştırma amaçlı kamuya açık olup Imperial College London ve Surrey and Borders Partnership NHS Foundation Trust tarafından sağlanmıştır.*

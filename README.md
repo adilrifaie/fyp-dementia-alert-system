@@ -16,7 +16,7 @@
 
 | Dashboard | Hasta Detay | Gün Detay | Uyarı Sayfası |
 |-----------|-------------|-----------| ------------- |
-| ![Dashboard](screenshots/dashboard.jpg) | ![PatientDetail](screenshots/patient_detail.jpg) | ![DayDetail](screenshots/day_detail.jpg) | ![Alert](screenshots/warning.jpg)
+| ![Dashboard](documentation/screenshots/dashboard.jpg) | ![PatientDetail](documentation/screenshots/patient_detail.jpg) | ![DayDetail](documentation/screenshots/day_detail.jpg) | ![Alert](documentation/screenshots/warning.jpg)
 
 ---
 
